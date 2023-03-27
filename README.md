@@ -10,40 +10,46 @@ then uncompress and retrieve the contents of the bundled files when needed.
 - Zero dependencies
 - Built for Deno
 
-## Installation
-
-To install Bundlee, simply import it directly from deno.land:
-
-```ts
-import { bundlePath, fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts"
-```
-
 ## Example Usage
-
-### Creating a Bundle
-
-```typescript
-import { bundlePath } from "https://deno.land/x/bundlee/mod.ts"
-
-const outFile = "bundle.json"
-
-const bundle = await bundlePath(Deno.cwd(), "plugins/web-interface/static", [".html", ".css", ".js"])
-
-await Deno.writeTextFile(outFile, JSON.stringify(bundle))
-
-console.log(`${Object.keys(bundle).length} files bundled and written to '${outFile}'`)
-```
 
 ### Getting files from a bundle
 
 ```typescript
-import { fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts"
-import { join } from "https://deno.land/std/path/mod.ts"
+import { Bundlee } from "https://deno.land/x/bundlee/mod.ts"
 
-const bundleFile = join(Deno.cwd(), "./bundle.json")
-const getFile = "plugins/web-interface/static/web-interface.html"
+// Bundlee.load is a static factory function returning a ready to use instance
+const staticFiles = await Bundlee.load("url")
 
-const fileContent = await fileContentFromBundle(getFile, bundleFile)
-
-console.log(`${getFile} extracted from ${bundleFile}:\n\n${fileContent}`)
+// Implement this in a middleware in your web framework,
+// ... or use it for something completely different!
+if (staticFiles.has("static/index.html")) {
+  const fileContent = staticFiles.get("static/index.html")
+}
 ```
+
+### Creating a Bundle
+
+To create a bundle using the `bundlee` CLI command, follow these steps:
+
+1. Install `bundlee` as a command-line tool:
+
+```sh
+deno install --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts
+```
+
+2. Use the bundlee command to create a bundle from a specified directory:
+
+```sh
+bundlee --path <path-to-your-directory> <output-bundle-file>
+```
+
+Replace <path-to-your-directory> with the path of the directory you want to bundle and <output-bundle-file> with the desired output file name (e.g., bundle.json).
+
+Example:
+
+```sh
+bundlee --path static/ bundle.json
+```
+
+This command will create a bundle of the `static/` directory and save it as bundle.json. Files in the bundle will be named `static/dir/file.name` based on where the working directory where you ran the
+command.
