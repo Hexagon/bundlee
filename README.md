@@ -12,21 +12,18 @@ then uncompress and retrieve the contents of the bundled files when needed.
 
 ## Installation
 
-````bash
-import { bundlePath, fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts";
-
-## Installation
-
 To install Bundlee, simply import it directly from deno.land:
 
-    import { bundlePath, fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts";
+```ts
+import { bundlePath, fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts";
+```
 
 ## Example Usage
 
-### Creating a Bundle File
+### Creating a Bundle
 
 ```typescript
-import { bundlePath } from "./bundlee/mod.ts";
+import { bundlePath } from "https://deno.land/x/bundlee/mod.ts";
 
 const outFile = "bundle.json";
 
@@ -35,12 +32,12 @@ const bundle = await bundlePath(Deno.cwd(), "plugins/web-interface/static", [".h
 await Deno.writeTextFile(outFile, JSON.stringify(bundle));
 
 console.log(`${Object.keys(bundle).length} files bundled and written to '${outFile}'`);
-````
+```
 
 ### Getting files from a bundle
 
 ```typescript
-import { fileContentFromBundle } from "./bundlee/mod.ts"
+import { fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts";
 import { join } from "https://deno.land/std/path/mod.ts"
 
 const bundleFile = join(Deno.cwd(), "./bundle.json")
