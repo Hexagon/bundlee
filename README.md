@@ -15,7 +15,7 @@ then uncompress and retrieve the contents of the bundled files when needed.
 To install Bundlee, simply import it directly from deno.land:
 
 ```ts
-import { bundlePath, fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts";
+import { bundlePath, fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts"
 ```
 
 ## Example Usage
@@ -23,21 +23,21 @@ import { bundlePath, fileContentFromBundle } from "https://deno.land/x/bundlee/m
 ### Creating a Bundle
 
 ```typescript
-import { bundlePath } from "https://deno.land/x/bundlee/mod.ts";
+import { bundlePath } from "https://deno.land/x/bundlee/mod.ts"
 
-const outFile = "bundle.json";
+const outFile = "bundle.json"
 
-const bundle = await bundlePath(Deno.cwd(), "plugins/web-interface/static", [".html", ".css", ".js"]);
+const bundle = await bundlePath(Deno.cwd(), "plugins/web-interface/static", [".html", ".css", ".js"])
 
-await Deno.writeTextFile(outFile, JSON.stringify(bundle));
+await Deno.writeTextFile(outFile, JSON.stringify(bundle))
 
-console.log(`${Object.keys(bundle).length} files bundled and written to '${outFile}'`);
+console.log(`${Object.keys(bundle).length} files bundled and written to '${outFile}'`)
 ```
 
 ### Getting files from a bundle
 
 ```typescript
-import { fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts";
+import { fileContentFromBundle } from "https://deno.land/x/bundlee/mod.ts"
 import { join } from "https://deno.land/std/path/mod.ts"
 
 const bundleFile = join(Deno.cwd(), "./bundle.json")
