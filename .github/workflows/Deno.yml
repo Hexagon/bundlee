@@ -1,0 +1,27 @@
+name: Deno CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        deno-version: [1.31.0, "v1.x"]
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Deno Version ${{ matrix.deno-version }}
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ matrix.deno-version }}
+
+      - name: Run all checks
+        run: deno task check

@@ -1,0 +1,12 @@
+{
+  "fmt": {
+    "options": {
+      "lineWidth": 200,
+      "semiColons": false
+    }
+  },
+  "tasks": {
+    "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts",
+    "check": "deno fmt --check && deno lint && deno check mod.ts && deno test --allow-read --allow-write"
+  }
+}
