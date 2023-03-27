@@ -1,7 +1,7 @@
 import { Bundlee } from "./mod.ts"
 import { parse } from "https://deno.land/std/flags/mod.ts"
 
-const VERSION = "1.0.0"
+const VERSION = "0.9.0"
 const HELP = `
 bundlee - A CLI tool to generate a compressed JSON-bundle of multiple static assets
 

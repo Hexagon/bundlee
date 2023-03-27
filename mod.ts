@@ -1,4 +1,5 @@
-import { decode, encode, join, parse, readAll, relative } from "./deps.ts"
+import { decode, encode, join, parse, relative } from "./deps.ts"
+import { readAll, readerFromStreamReader } from "https://deno.land/std@0.181.0/streams/mod.ts"
 
 export class Bundlee {
   private loadedBundle?: Record<string, string>
@@ -48,9 +49,7 @@ export class Bundlee {
         .pipeThrough(new CompressionStream("gzip"))
         .pipeTo(dst.writable)
       const relativePath = relative(basePath, file).replaceAll("\\", "/")
-      result[relativePath] = encode(
-        (await (dst.readable.getReader()).read()).value || "",
-      )
+      result[relativePath] = encode(await readAll(readerFromStreamReader(dst.readable.getReader())))
     }
     return result
   }
@@ -107,9 +106,9 @@ export class Bundlee {
     if (encodedFileContent) {
       // Decode base64 encoded string to Uint8Array
       const compressedContent = decode(encodedFileContent)
-      // Set up a stream source and feed it with the compressed data
+
+      // Set up a stream source
       const src = new TransformStream<Uint8Array>()
-      src.writable.getWriter().write(compressedContent)
 
       // Set up a stream destination
       const dest = new TransformStream<Uint8Array>()
@@ -117,14 +116,18 @@ export class Bundlee {
       // Run compressed data through DecompressionStream
       src.readable
         .pipeThrough(new DecompressionStream("gzip"))
-        .pipeThrough(new TextDecoderStream())
+        .pipeTo(dest.writable)
+
+      // Feed the source
+      const writer = src.writable.getWriter()
+      const reader = dest.readable.getReader()
+
+      writer.write(compressedContent)
+
+      await writer.close()
 
       // Decode Uint8Array to string, and return
-      const decodedFileContent = new TextDecoder().decode(
-        await readAll((await (dest.readable.getReader()).read()).value),
-      )
-
-      return decodedFileContent
+      return new TextDecoder().decode(await readAll(readerFromStreamReader(reader)))
     } else {
       throw new Error("Requested file not found in bundle.")
     }
