@@ -1,8 +1,15 @@
-import { decode, encode, join, parse, relative } from "./deps.ts"
+import { contentType, decode, encode, join, parse, relative } from "./deps.ts"
 import { readAll, readerFromStreamReader } from "https://deno.land/std@0.181.0/streams/mod.ts"
 
+export interface Metadata {
+  content: string
+  contentType: string
+  lastModified: number
+}
+
 export class Bundlee {
-  private loadedBundle?: Record<string, string>
+  private loadedBundle?: Record<string, Metadata>
+  private cache: Record<string, Metadata> = {}
 
   /**
    * Recursively read a directory and return a list of files.
@@ -40,8 +47,8 @@ export class Bundlee {
   private async bundleFiles(
     basePath: string,
     fileList: string[],
-  ): Promise<Record<string, string>> {
-    const result: Record<string, string> = {}
+  ): Promise<Record<string, Metadata>> {
+    const result: Record<string, Metadata> = {}
     for (const file of fileList) {
       const src = await Deno.open(file)
       const dst = new TransformStream()
@@ -49,9 +56,21 @@ export class Bundlee {
         .pipeThrough(new CompressionStream("gzip"))
         .pipeTo(dst.writable)
       const relativePath = relative(basePath, file).replaceAll("\\", "/")
-      result[relativePath] = encode(await readAll(readerFromStreamReader(dst.readable.getReader())))
+      const content = encode(
+        await readAll(readerFromStreamReader(dst.readable.getReader())),
+      )
+
+      const contentType = await this.getContentType(file)
+      const lastModified = (await Deno.stat(file)).mtime?.getTime() || 0
+
+      result[relativePath] = { content, contentType, lastModified }
     }
     return result
+  }
+
+  private getContentType(filePath: string): string {
+    const filePathInParts = parse(filePath)
+    return contentType(filePathInParts.ext) || "application/octet-stream"
   }
 
   /**
@@ -59,13 +78,13 @@ export class Bundlee {
    * @param {string} basePath - The base path for file paths.
    * @param {string} path - The directory path.
    * @param {string[]} [exts] - An optional list of extensions to filter files.
-   * @returns {Promise<Record<string, string>>} - A promise that resolves to a JSON object containing encoded file contents.
+   * @returns {Promise<Record<string, Metadata>>} - A promise that resolves to a JSON object containing encoded file contents.
    */
   async bundle(
     basePath: string,
     path: string,
     exts?: string[],
-  ): Promise<Record<string, string>> {
+  ): Promise<Record<string, Metadata>> {
     const fileList = await this.recursiveReaddir(join(basePath, path), exts)
 
     if (!fileList || fileList.length === 0) {
@@ -95,17 +114,19 @@ export class Bundlee {
    * @param {string} bundlePath - The path of the JSON bundle.
    * @returns {string} - A promise that resolves to the content of the file.
    */
-  async get(
-    filePath: string,
-  ): Promise<string> {
+  async get(filePath: string): Promise<Metadata> {
     if (!this.loadedBundle) {
       throw new Error("No bundle loaded.")
     }
 
-    const encodedFileContent = this.loadedBundle[filePath]
-    if (encodedFileContent) {
+    if (this.cache[filePath]) {
+      return this.cache[filePath]
+    }
+
+    const metadata = this.loadedBundle[filePath]
+    if (metadata) {
       // Decode base64 encoded string to Uint8Array
-      const compressedContent = decode(encodedFileContent)
+      const compressedContent = decode(metadata.content)
 
       // Set up a stream source
       const src = new TransformStream<Uint8Array>()
@@ -126,22 +147,74 @@ export class Bundlee {
 
       await writer.close()
 
-      // Decode Uint8Array to string, and return
-      return new TextDecoder().decode(await readAll(readerFromStreamReader(reader)))
+      // Decode Uint8Array to string
+      const text = new TextDecoder().decode(
+        await readAll(readerFromStreamReader(reader)),
+      )
+
+      // Update the content in the Metadata object and cache it
+      const updatedMetadata: Metadata = {
+        content: text,
+        contentType: metadata.contentType,
+        lastModified: metadata.lastModified,
+      }
+      this.cache[filePath] = updatedMetadata
+
+      return updatedMetadata
     } else {
       throw new Error("Requested file not found in bundle.")
     }
   }
 
-  async import(fileUrl: string) {
+  async import(
+    fileUrl: string,
+    importType: "import" | "fetch" | "local" = "local",
+  ) {
+    if (importType === "fetch") {
+      await this.importRemote(fileUrl)
+    } else if (importType === "import") {
+      await this.importAsModule(fileUrl)
+    } else {
+      await this.importLocal(fileUrl)
+    }
+  }
+
+  async importRemote(fileUrl: string) {
+    const response = await fetch(fileUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch bundle from ${fileUrl}`)
+    }
+    this.loadedBundle = await response.json()
+  }
+
+  async importLocal(fileUrl: string) {
+    const fileContent = await Deno.readTextFile(fileUrl)
+    this.loadedBundle = JSON.parse(fileContent)
+  }
+
+  async importAsModule(fileUrl: string) {
     this.loadedBundle = (await import(fileUrl, {
       assert: { type: "json" },
     })).default
   }
 
-  static async load(fileUrl: string): Promise<Bundlee> {
+  async preloadCache(): Promise<void> {
+    if (!this.loadedBundle) {
+      throw new Error("No bundle loaded.")
+    }
+
+    const fileKeys = Object.keys(this.loadedBundle)
+    for (const key of fileKeys) {
+      await this.get(key)
+    }
+  }
+
+  static async load(
+    fileUrl: string,
+    importType: "import" | "fetch" | "local" = "local",
+  ): Promise<Bundlee> {
     const inst = new Bundlee()
-    await inst.import(fileUrl)
+    await inst.import(fileUrl, importType)
     return inst
   }
 }

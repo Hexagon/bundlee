@@ -7,6 +7,6 @@
   },
   "tasks": {
     "update-deps": "deno run --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts --dry-run deps.ts",
-    "check": "deno fmt && deno lint && deno check mod.ts && deno check bundlee.ts && deno test --allow-read --allow-write"
+    "check": "deno fmt && deno lint && deno check mod.ts && deno check bundlee.ts && deno test --allow-read --allow-write --allow-net"
   }
 }

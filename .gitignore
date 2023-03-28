@@ -9,6 +9,7 @@ deno.lock
 
 # Bundlee test files
 test_bundle.json
+bundle.json
 
 # VS Code
 .vscode/*

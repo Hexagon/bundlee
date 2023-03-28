@@ -63,9 +63,6 @@ Run bundlee cli to generate a bundle, make sure to run from the root of your sta
 editor.
 
 ```ts
-// contentType from std is needed
-import { contentType } from "https://deno.land/std@0.181.0/media_types/content_type.ts"
-
 // Generate an url to bundle.json, relative to current file path
 // this is to make everything work later when code and bundle is published to a cdn.
 //
@@ -86,10 +83,14 @@ this.app.use(async (context: any, next: any) => {
 
   // Serve!
   if (staticFiles.has(url)) {
-    context.response.headers.set("Content-Type", contentType(context.request.url.pathname))
-    context.response.body = await staticFiles.get(url)
+    context.response.body = await bundle.get(filePath)
+    context.response.type = bundle.loadedBundle![filePath].contentType
+    context.response.headers.set(
+      "Last-Modified",
+      new Date(bundle.loadedBundle![filePath].lastModified).toUTCString(),
+    )
   } else {
-    next()
+    await next()
   }
 })
 ```
