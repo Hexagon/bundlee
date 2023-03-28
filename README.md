@@ -83,7 +83,7 @@ this.app.use(async (context: any, next: any) => {
 
   // Serve!
   if (staticFiles.has(url)) {
-    const fileData = staticFiles.get(url)
+    const fileData = await staticFiles.get(url)
     context.response.body = fileData.content
     context.response.type = fileData.contentType
     context.response.headers.set(
@@ -100,7 +100,7 @@ this.app.use(async (context: any, next: any) => {
 
 ### Class: `Bundlee`
 
-### *Helper factory*
+### _Helper factory_
 
 #### static async **load**(fileUrl: string, importType: "import" | "fetch" | "local" = "import"): Promise<Bundlee>
 
@@ -111,13 +111,7 @@ Factory function that loads a bundle JSON file and creates a new instance of `Bu
 
 Returns a promise that resolves to a new instance of `Bundlee`.
 
-### *Constructor*
-
-#### **constructor()**
-
-Creates a new instance of `Bundlee`.
-
-### *Creating bundles*
+### _Creating bundles_
 
 #### `async` **bundle** (basePath: string, path: string, exts?: string[]) `Promise<Record<string, Metadata>>`
 
@@ -129,7 +123,7 @@ Bundles files from a directory into a single JSON object.
 
 Returns a promise that resolves to a JSON object containing encoded file contents.
 
-### *Extracting files from a bundle*
+### _Extracting files from a bundle_
 
 #### `async` **get**(filePath: string) `Promise<Metadata>`
 
@@ -147,7 +141,7 @@ Checks if a file exists in a JSON bundle.
 
 Returns `true` if the file exists in the bundle, `false` otherwise.
 
-### *Importing bundles*
+### _Importing bundles_
 
 #### `async` **import**(fileUrl: string, importType: "import" | "fetch" | "local" = "local") `Promise<void>`
 

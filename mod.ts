@@ -12,10 +12,25 @@ export class Bundlee {
   private cache: Record<string, Metadata> = {}
 
   /**
+   * Factory function that loads a bundle JSON file and creates a new instance of `Bundlee`.
+   * @param fileUrl The URL of the bundle JSON file.
+   * @param importType The type of import to use. Possible values are "import", "fetch", and "local". The default value is "local".
+   * @returns A promise that resolves to a new instance of `Bundlee`.
+   */
+  static async load(
+    fileUrl: string,
+    importType: "import" | "fetch" | "local" = "local",
+  ): Promise<Bundlee> {
+    const inst = new Bundlee()
+    await inst.import(fileUrl, importType)
+    return inst
+  }
+
+  /**
    * Recursively read a directory and return a list of files.
-   * @param {string} path - The directory path.
-   * @param {string[]} [extensionFilter] - An optional list of extensions to filter files.
-   * @returns {Promise<string[]>} - A promise that resolves to an array of file paths.
+   * @param path The directory path.
+   * @param extensionFilter An optional list of extensions to filter files.
+   * @returns A promise that resolves to an array of file paths.
    */
   private async recursiveReaddir(
     path: string,
@@ -40,9 +55,9 @@ export class Bundlee {
 
   /**
    * Bundle files into a single JSON object.
-   * @param {string} basePath - The base path for file paths.
-   * @param {string[]} fileList - A list of file paths.
-   * @returns {Promise<Record<string, string>>} - A promise that resolves to a JSON object containing encoded file contents.
+   * @param basePath The base path for file paths.
+   * @param fileList A list of file paths.
+   * @returns A promise that resolves to a JSON object containing encoded file contents.
    */
   private async bundleFiles(
     basePath: string,
@@ -96,9 +111,8 @@ export class Bundlee {
 
   /**
    * Checks if a file exists in a JSON bundle.
-   * @param {string} filePath - The path of the file to retrieve.
-   * @param {string} bundlePath - The path of the JSON bundle.
-   * @returns {string} - A promise that resolves to the content of the file.
+   * @param filePath The path of the file to retrieve.
+   * @returns true if the file exists in the bundle, false otherwise.
    */
   has(filePath: string): boolean {
     if (this.loadedBundle && (this.loadedBundle[filePath] !== undefined)) {
@@ -110,9 +124,8 @@ export class Bundlee {
 
   /**
    * Get the content of a file from a JSON bundle.
-   * @param {string} filePath - The path of the file to retrieve.
-   * @param {string} bundlePath - The path of the JSON bundle.
-   * @returns {string} - A promise that resolves to the content of the file.
+   * @param filePath The path of the file to retrieve.
+   * @returns A promise that resolves to the metadata object for the file, containing its content, content type, and last modified time.
    */
   async get(filePath: string): Promise<Metadata> {
     if (!this.loadedBundle) {
@@ -166,6 +179,15 @@ export class Bundlee {
     }
   }
 
+  /**
+   * Imports a bundle JSON file.
+   *
+   * Used by the load()-factory
+   *
+   * @param fileUrl The URL of the bundle JSON file.
+   * @param importType The type of import to use. Possible values are "import", "fetch", and "local". The default value is "local".
+   * @returns A promise that resolves when the bundle is loaded.
+   */
   async import(
     fileUrl: string,
     importType: "import" | "fetch" | "local" = "import",
@@ -179,6 +201,11 @@ export class Bundlee {
     }
   }
 
+  /**
+   * Imports a bundle JSON file using the `fetch()` function.
+   * @param fileUrl The URL of the bundle JSON file.
+   * @returns A promise that resolves when the bundle is loaded.
+   */
   async importRemote(fileUrl: string) {
     const response = await fetch(fileUrl)
     if (!response.ok) {
@@ -187,17 +214,32 @@ export class Bundlee {
     this.loadedBundle = await response.json()
   }
 
+  /**
+   * Imports a bundle JSON file from the local filesystem.
+   * @param fileUrl The path of the bundle JSON file.
+   * @returns A promise that resolves when the bundle is loaded.
+   */
+
   async importLocal(fileUrl: string) {
     const fileContent = await Deno.readTextFile(fileUrl)
     this.loadedBundle = JSON.parse(fileContent)
   }
 
+  /**
+   * Imports a bundle JSON file using the `import()` function.
+   * @param fileUrl The URL of the bundle JSON file.
+   * @returns A promise that resolves when the bundle is loaded.
+   */
   async importAsModule(fileUrl: string) {
     this.loadedBundle = (await import(fileUrl, {
       assert: { type: "json" },
     })).default
   }
 
+  /**
+   * Preloads the cache with all the files in the bundle.
+   * @returns A promise that resolves when the cache is loaded.
+   */
   async preloadCache(): Promise<void> {
     if (!this.loadedBundle) {
       throw new Error("No bundle loaded.")
@@ -207,14 +249,5 @@ export class Bundlee {
     for (const key of fileKeys) {
       await this.get(key)
     }
-  }
-
-  static async load(
-    fileUrl: string,
-    importType: "import" | "fetch" | "local" = "local",
-  ): Promise<Bundlee> {
-    const inst = new Bundlee()
-    await inst.import(fileUrl, importType)
-    return inst
   }
 }
