@@ -43,7 +43,7 @@ deno install --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts
 2. Use the bundlee command to create a bundle from a specified directory:
 
 ```sh
-bundlee --path <path-to-your-directory> <output-bundle-file>
+bundlee --bundle <path-to-your-directory> <output-bundle-file>
 ```
 
 Replace <path-to-your-directory> with the path of the directory you want to bundle and <output-bundle-file> with the desired output file name (e.g., bundle.json).
@@ -51,11 +51,31 @@ Replace <path-to-your-directory> with the path of the directory you want to bund
 Example:
 
 ```sh
-bundlee --path static/ bundle.json
+bundlee --bundle static/ bundle.json
 ```
 
 This command will create a bundle of the `static/` directory and save it as bundle.json. Files in the bundle will be named `static/dir/file.name` based on where the working directory where you ran the
 command.
+
+3. Restoring files from a bundle:
+
+Given a path to a directory and a path to a bundle file, the `--restore` or `-r` option restores all files in the bundle to the specified directory, preserving their original paths and modified times.
+To use this option, run the CLI command with the following syntax:
+
+```sh
+bundlee --restore <path-to-bundle-file> [<path-to-your-directory>]
+```
+
+Replace `<path-to-bundle-file>` with the path of the bundle file you want to restore from. `<path-to-your-directory>` is optional and will change where files are restored. By default, the files in the
+bundle will be restored to their original paths relative to the specified directory.
+
+Example:
+
+```sh
+bundlee --restore bundle.json
+```
+
+This command will restore the files in `bundle.json` file to the current directory, preserving their original paths and modified times.
 
 ## Example Oak Middleware
 

@@ -1,4 +1,4 @@
-import { contentType, decode, encode, join, parse, relative } from "./deps.ts"
+import { contentType, decode, dirname, encode, join, parse, relative } from "./deps.ts"
 import { readAll, readerFromStreamReader } from "https://deno.land/std@0.181.0/streams/mod.ts"
 
 export interface Metadata {
@@ -249,5 +249,41 @@ export class Bundlee {
     for (const key of fileKeys) {
       await this.get(key)
     }
+  }
+
+  /**
+   * Restores all files in the bundle to the filesystem, including their modified time.
+   * @param targetPath The path to restore files to.
+   * @returns A promise that resolves when all files are restored.
+   */
+  async restore(targetPath: string): Promise<void> {
+    if (!this.loadedBundle) {
+      throw new Error("No bundle loaded.")
+    }
+
+    const fileKeys = Object.keys(this.loadedBundle)
+
+    // Create a promise array to wait for all file write and utime operations
+    const writePromises: Promise<void>[] = []
+
+    for (const key of fileKeys) {
+      const metadata = await this.get(key)
+      const restoredFilePath = join(targetPath, key)
+
+      // Ensure the target directory exists
+      await Deno.mkdir(dirname(restoredFilePath), { recursive: true })
+
+      // Write the content to the file
+      const contentArrayBuffer = new TextEncoder().encode(metadata.content)
+      const writePromise = Deno.writeFile(restoredFilePath, contentArrayBuffer)
+      writePromises.push(writePromise)
+
+      // Update the modified and access times
+      const utimePromise = writePromise.then(() => Deno.utime(restoredFilePath, metadata.lastModified / 1000, metadata.lastModified / 1000))
+      writePromises.push(utimePromise)
+    }
+
+    // Wait for all file write and utime operations to complete
+    await Promise.all(writePromises)
   }
 }

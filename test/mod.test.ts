@@ -168,3 +168,33 @@ Deno.test("metadata includes createTime and contentType", async () => {
 
   await Deno.remove(bundleFile)
 })
+
+Deno.test("restoreFilesFromBundle", async () => {
+  const basePath = Deno.cwd()
+  const path = join("test", "test_files")
+  const exts = [".txt"]
+  const bundleFile = join("test", "test_files", "test_bundle.json")
+  const outputDir = join("test", "test_output")
+
+  const bundlee = new Bundlee()
+  const bundle = await bundlee.bundle(basePath, path, exts)
+  await Deno.writeTextFile(bundleFile, JSON.stringify(bundle))
+
+  const loadedBundlee = await Bundlee.load("./" + bundleFile)
+  await loadedBundlee.restore(outputDir)
+
+  const restoredFileContent1 = await Deno.readTextFile(join(outputDir, "test", "test_files", "test1.txt"))
+  const originalContent1 = await Deno.readTextFile(join(basePath, "test", "test_files", "test1.txt"))
+  assertEquals(restoredFileContent1, originalContent1)
+
+  const restoredFileContent2 = await Deno.readTextFile(join(outputDir, "test", "test_files", "test2.txt"))
+  const originalContent2 = await Deno.readTextFile(join(basePath, "test", "test_files", "test2.txt"))
+  assertEquals(restoredFileContent2, originalContent2)
+
+  const restoredFileContent3 = await Deno.readTextFile(join(outputDir, "test", "test_files", "test3.txt"))
+  const originalContent3 = await Deno.readTextFile(join(basePath, "test", "test_files", "test3.txt"))
+  assertEquals(restoredFileContent3, originalContent3)
+
+  await Deno.remove(outputDir, { recursive: true })
+  await Deno.remove(bundleFile)
+})
