@@ -100,9 +100,9 @@ this.app.use(async (context: any, next: any) => {
 
 ### Class: `Bundlee`
 
-#### Helper factory
+### *Helper factory*
 
-##### static async **load**(fileUrl: string, importType: "import" | "fetch" | "local" = "import"): Promise<Bundlee>
+#### static async **load**(fileUrl: string, importType: "import" | "fetch" | "local" = "import"): Promise<Bundlee>
 
 Factory function that loads a bundle JSON file and creates a new instance of `Bundlee`.
 
@@ -111,15 +111,15 @@ Factory function that loads a bundle JSON file and creates a new instance of `Bu
 
 Returns a promise that resolves to a new instance of `Bundlee`.
 
-#### Constructor
+### *Constructor*
 
-##### **constructor()**
+#### **constructor()**
 
 Creates a new instance of `Bundlee`.
 
-#### Creating bundles
+### *Creating bundles*
 
-##### async bundle(basePath: string, path: string, exts?: string[]): Promise<Record<string, Metadata>>
+#### `async` **bundle** (basePath: string, path: string, exts?: string[]) `Promise<Record<string, Metadata>>`
 
 Bundles files from a directory into a single JSON object.
 
@@ -129,9 +129,9 @@ Bundles files from a directory into a single JSON object.
 
 Returns a promise that resolves to a JSON object containing encoded file contents.
 
-#### Extracting files from a bundle
+### *Extracting files from a bundle*
 
-##### async **get**(filePath: string): Promise<Metadata>
+#### `async` **get**(filePath: string) `Promise<Metadata>`
 
 Gets the content of a file from a JSON bundle.
 
@@ -139,7 +139,7 @@ Gets the content of a file from a JSON bundle.
 
 Returns a promise that resolves to the metadata object for the file, containing its content, content type, and last modified time.
 
-##### **has**(filePath: string): boolean
+#### **has**(filePath: string) `boolean`
 
 Checks if a file exists in a JSON bundle.
 
@@ -147,9 +147,9 @@ Checks if a file exists in a JSON bundle.
 
 Returns `true` if the file exists in the bundle, `false` otherwise.
 
-##### Importing bundles
+### *Importing bundles*
 
-##### async **import**(fileUrl: string, importType: "import" | "fetch" | "local" = "local"): Promise<void>`
+#### `async` **import**(fileUrl: string, importType: "import" | "fetch" | "local" = "local") `Promise<void>`
 
 Imports a bundle JSON file.
 
@@ -158,7 +158,7 @@ Imports a bundle JSON file.
 
 Returns a promise that resolves when the bundle is loaded.
 
-##### async **importAsModule**(fileUrl: string): Promise<void>
+#### `async` **importAsModule**(fileUrl: string) `Promise<void>`
 
 Imports a bundle JSON file using the `import()` function.
 
@@ -166,7 +166,7 @@ Imports a bundle JSON file using the `import()` function.
 
 Returns a promise that resolves when the bundle is loaded.
 
-##### async **importLocal**(fileUrl: string): Promise<void>
+#### `async` **importLocal**(fileUrl: string): `Promise<void>`
 
 Imports a bundle JSON file from the local filesystem.
 
@@ -174,7 +174,7 @@ Imports a bundle JSON file from the local filesystem.
 
 Returns a promise that resolves when the bundle is loaded.
 
-##### async **importRemote**(fileUrl: string): Promise<void>
+#### `async` **importRemote**(fileUrl: string) `Promise<void>`
 
 Imports a bundle JSON file using the `fetch()` function.
 
@@ -182,7 +182,7 @@ Imports a bundle JSON file using the `fetch()` function.
 
 Returns a promise that resolves when the bundle is loaded.
 
-##### async **preloadCache**(): Promise<void>`
+#### `async` **preloadCache**() `Promise<void>`
 
 Preloads the cache with all the files in the bundle.
 
