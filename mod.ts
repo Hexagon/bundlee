@@ -168,7 +168,7 @@ export class Bundlee {
 
   async import(
     fileUrl: string,
-    importType: "import" | "fetch" | "local" = "local",
+    importType: "import" | "fetch" | "local" = "import",
   ) {
     if (importType === "fetch") {
       await this.importRemote(fileUrl)

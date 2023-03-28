@@ -83,14 +83,97 @@ this.app.use(async (context: any, next: any) => {
 
   // Serve!
   if (staticFiles.has(url)) {
-    context.response.body = await bundle.get(filePath)
-    context.response.type = bundle.loadedBundle![filePath].contentType
+    const fileData = staticFiles.get(url)
+    context.response.body = fileData.content
+    context.response.type = fileData.contentType
     context.response.headers.set(
       "Last-Modified",
-      new Date(bundle.loadedBundle![filePath].lastModified).toUTCString(),
+      new Date(fileData.lastModified).toUTCString(),
     )
   } else {
     await next()
   }
 })
 ```
+
+## API
+
+### Class: `Bundlee`
+
+#### `static async load(fileUrl: string, importType: "import" | "fetch" | "local" = "import"): Promise<Bundlee>`
+
+Factory function that loads a bundle JSON file and creates a new instance of `Bundlee`.
+
+- `fileUrl`: The URL of the bundle JSON file.
+- `importType`: The type of import to use. Possible values are "import", "fetch", and "local". The default value is "import".
+
+Returns a promise that resolves to a new instance of `Bundlee`.
+
+#### `constructor()`
+
+Creates a new instance of `Bundlee`.
+
+#### `async bundle(basePath: string, path: string, exts?: string[]): Promise<Record<string, Metadata>>`
+
+Bundles files from a directory into a single JSON object.
+
+- `basePath`: The base path for file paths.
+- `path`: The directory path.
+- `exts`: An optional list of extensions to filter files.
+
+Returns a promise that resolves to a JSON object containing encoded file contents.
+
+#### `async get(filePath: string): Promise<Metadata>`
+
+Gets the content of a file from a JSON bundle.
+
+- `filePath`: The path of the file to retrieve.
+
+Returns a promise that resolves to the metadata object for the file, containing its content, content type, and last modified time.
+
+#### `async import(fileUrl: string, importType: "import" | "fetch" | "local" = "local"): Promise<void>`
+
+Imports a bundle JSON file.
+
+- `fileUrl`: The URL of the bundle JSON file.
+- `importType`: The type of import to use. Possible values are "import", "fetch", and "local". The default value is "local".
+
+Returns a promise that resolves when the bundle is loaded.
+
+#### `async importAsModule(fileUrl: string): Promise<void>`
+
+Imports a bundle JSON file using the `import()` function.
+
+- `fileUrl`: The URL of the bundle JSON file.
+
+Returns a promise that resolves when the bundle is loaded.
+
+#### `async importLocal(fileUrl: string): Promise<void>`
+
+Imports a bundle JSON file from the local filesystem.
+
+- `fileUrl`: The path of the bundle JSON file.
+
+Returns a promise that resolves when the bundle is loaded.
+
+#### `async importRemote(fileUrl: string): Promise<void>`
+
+Imports a bundle JSON file using the `fetch()` function.
+
+- `fileUrl`: The URL of the bundle JSON file.
+
+Returns a promise that resolves when the bundle is loaded.
+
+#### `async preloadCache(): Promise<void>`
+
+Preloads the cache with all the files in the bundle.
+
+Returns a promise that resolves when the cache is loaded.
+
+#### `has(filePath: string): boolean`
+
+Checks if a file exists in a JSON bundle.
+
+- `filePath`: The path of the file to retrieve.
+
+Returns `true` if the file exists in the bundle, `false` otherwise.
