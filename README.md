@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://cdn.jsdelivr.net/gh/hexagon/bundlee@main/docs/bundlee.png?v2" alt="Bundlee">
+</p>
+
 # Bundlee
 
 Bundlee is a Deno library designed to consolidate static files from a specified folder into a single JSON file. The library compresses these files using gzip and stores them in base64 format. Bundlee

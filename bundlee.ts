@@ -1,7 +1,7 @@
 import { Bundlee } from "./mod.ts"
 import { join, parseFlags } from "./deps.ts"
 
-const VERSION = "0.9.6"
+const VERSION = "0.9.4"
 const HELP = `
 bundlee - A CLI tool to generate a compressed JSON-bundle of multiple static assets and restore them
 
