@@ -3,12 +3,29 @@ import { readAll, readerFromStreamReader } from "@std/io"
 import { decodeBase64Url, encodeBase64Url } from "@std/encoding/base64url"
 import { contentType } from "@std/media-types"
 
+/**
+ * Represents metadata associated with a piece of content.
+ */
 export interface Metadata {
+  /**
+   * The actual content, such as text or raw data.
+   */
   content: string
+
+  /**
+   * The content type (MIME type) of the content, e.g., "text/plain", "image/jpeg".
+   */
   contentType: string
+
+  /**
+   * Timestamp (in Unix epoch time or similar) indicating when the content was last modified.
+   */
   lastModified: number
 }
 
+/**
+ * Bundlee main class
+ */
 export class Bundlee {
   private loadedBundle?: Record<string, Metadata>
   private cache: Record<string, Metadata> = {}
@@ -85,6 +102,12 @@ export class Bundlee {
     return result
   }
 
+  /**
+   * Determines the likely content type (MIME type) of a file based on its file extension.
+   *
+   * @param filePath - The path to the file.
+   * @returns The inferred content type, or "application/octet-stream" if unknown.
+   */
   private getContentType(filePath: string): string {
     const filePathInParts = parse(filePath)
     return contentType(filePathInParts.ext) || "application/octet-stream"
