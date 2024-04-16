@@ -1,5 +1,7 @@
-import { contentType, decode, dirname, encode, join, parse, relative } from "./deps.ts"
-import { readAll, readerFromStreamReader } from "https://deno.land/std@0.181.0/streams/mod.ts"
+import { dirname, join, parse, relative } from "@std/path"
+import { readAll, readerFromStreamReader } from "@std/io"
+import { decodeBase64Url, encodeBase64Url } from "@std/encoding/base64url"
+import { contentType } from "@std/media-types"
 
 export interface Metadata {
   content: string
@@ -57,7 +59,7 @@ export class Bundlee {
    * Bundle files into a single JSON object.
    * @param basePath The base path for file paths.
    * @param fileList A list of file paths.
-   * @returns A promise that resolves to a JSON object containing encoded file contents.
+   * @returns A promise that resolves to a JSON object containing encodeBase64Urld file contents.
    */
   private async bundleFiles(
     basePath: string,
@@ -71,7 +73,7 @@ export class Bundlee {
         .pipeThrough(new CompressionStream("gzip"))
         .pipeTo(dst.writable)
       const relativePath = relative(basePath, file).replaceAll("\\", "/")
-      const content = encode(
+      const content = encodeBase64Url(
         await readAll(readerFromStreamReader(dst.readable.getReader())),
       )
 
@@ -93,7 +95,7 @@ export class Bundlee {
    * @param {string} basePath - The base path for file paths.
    * @param {string} path - The directory path.
    * @param {string[]} [exts] - An optional list of extensions to filter files.
-   * @returns {Promise<Record<string, Metadata>>} - A promise that resolves to a JSON object containing encoded file contents.
+   * @returns {Promise<Record<string, Metadata>>} - A promise that resolves to a JSON object containing encodeBase64Urld file contents.
    */
   async bundle(
     basePath: string,
@@ -138,8 +140,8 @@ export class Bundlee {
 
     const metadata = this.loadedBundle[filePath]
     if (metadata) {
-      // Decode base64 encoded string to Uint8Array
-      const compressedContent = decode(metadata.content)
+      // decodeBase64Url base64 encodeBase64Urld string to Uint8Array
+      const compressedContent = decodeBase64Url(metadata.content)
 
       // Set up a stream source
       const src = new TransformStream<Uint8Array>()
@@ -160,7 +162,7 @@ export class Bundlee {
 
       await writer.close()
 
-      // Decode Uint8Array to string
+      // decodeBase64Url Uint8Array to string
       const text = new TextDecoder().decode(
         await readAll(readerFromStreamReader(reader)),
       )
@@ -231,9 +233,9 @@ export class Bundlee {
    * @returns A promise that resolves when the bundle is loaded.
    */
   async importAsModule(fileUrl: string) {
-    this.loadedBundle = (await import(fileUrl, {
-      assert: { type: "json" },
-    })).default
+    this.loadedBundle = await import(fileUrl, {
+      with: { type: "json" },
+    });
   }
 
   /**

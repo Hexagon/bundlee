@@ -1,5 +1,6 @@
 import { Bundlee } from "./mod.ts"
-import { join, parseFlags } from "./deps.ts"
+import { join } from "@std/path"
+import { ArgsParser } from "@cross/utils"
 
 const VERSION = "0.9.4"
 const HELP = `
@@ -37,40 +38,39 @@ function printErrorAndHelp(errorMessage: string) {
 }
 
 async function run() {
-  const args = parseFlags(Deno.args, {
-    alias: {
-      help: ["h"],
-      version: ["v"],
-      restore: ["r"],
-      bundle: ["b"],
+  const args = new ArgsParser(Deno.args, {
+    aliases: {
+      "help": "h",
+      version: "v",
+      restore: "r",
+      bundle: "b",
     },
     boolean: ["help", "version"],
-    string: ["bundle", "restore"],
   })
 
-  if (args.help) {
+  if (args.getBoolean("help")) {
     printHelp()
   }
 
-  if (args.version) {
+  if (args.getBoolean("version")) {
     printVersion()
   }
 
-  if (!args.bundle && !args.restore) {
+  if (!args.get("bundle") && !args.get("restore")) {
     console.error("No action specified, provide either --bundle or --restore.")
     Deno.exit(1)
   }
 
-  const path = args.bundle || args.restore
-  const outputFile = args._[0] as string
+  const path = args.get("bundle") || args.get("restore")
+  const outputFile = args.getLoose()[0] as string
   const basePath = Deno.cwd()
   const bundlee = new Bundlee()
 
-  if (args.bundle && path && outputFile) {
+  if (args.get("bundle") && path && outputFile) {
     const bundle = await bundlee.bundle(basePath, path)
     await Deno.writeTextFile(outputFile, JSON.stringify(bundle))
     console.log(`Bundle generated and saved to '${outputFile}'`)
-  } else if (args.restore && path) {
+  } else if (args.get("restore") && path) {
     await bundlee.importLocal(path)
     await bundlee.restore(join(Deno.cwd(), outputFile || ""))
     console.log(`Bundle restored to ${outputFile || "current directory."}`)

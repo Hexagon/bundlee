@@ -1,7 +1,8 @@
-import { assertEquals, assertRejects } from "https://deno.land/std@0.181.0/testing/asserts.ts"
+import { assertEquals, assertRejects } from "@std/assert"
 
-import { Bundlee, Metadata } from "../mod.ts"
-import { join } from "../deps.ts"
+import { Bundlee } from "../mod.ts"
+import type { Metadata } from "../mod.ts"
+import { join } from "@std/path"
 
 Deno.test("recursiveReaddir and bundleFiles", async () => {
   const basePath = Deno.cwd()
