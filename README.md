@@ -22,7 +22,7 @@ for the appropriate URL from the bundle when needed.
 ### Getting files from a bundle
 
 ```typescript
-import { Bundlee } from "jsr:@hexagon/bundlee"
+import { Bundlee } from "jsr:@hexagon/bundlee/mod.ts"
 
 // Bundlee.load is a static factory function returning a ready to use instance
 const staticFiles = await Bundlee.load("url")

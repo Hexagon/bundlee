@@ -1,7 +1,10 @@
 {
   "name": "@hexagon/bundlee",
   "version": "0.9.5",
-  "exports": "./mod.ts",
+  "exports": {
+    ".": "./bundlee.ts",
+    "./mod.ts": "./mod.ts"
+  },
 
   "fmt": {
     "lineWidth": 200,
