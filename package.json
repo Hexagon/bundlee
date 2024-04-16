@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@cross/test": "npm:@jsr/cross__test@^0.0.9",
+    "@cross/utils": "npm:@jsr/cross__utils@^0.11.0",
+    "@std/assert": "npm:@jsr/std__assert@^0.223.0",
+    "@std/encoding": "npm:@jsr/std__encoding@^0.223.0",
+    "@std/io": "npm:@jsr/std__io@^0.223.0",
+    "@std/media-types": "npm:@jsr/std__media-types@^0.223.0",
+    "@std/path": "npm:@jsr/std__path@^0.223.0"
+  }
+}

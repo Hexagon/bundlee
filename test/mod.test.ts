@@ -1,10 +1,11 @@
 import { assertEquals, assertRejects } from "@std/assert"
+import { test } from "@cross/test"
 
 import { Bundlee } from "../mod.ts"
 import type { Metadata } from "../mod.ts"
 import { join } from "@std/path"
 
-Deno.test("recursiveReaddir and bundleFiles", async () => {
+test("recursiveReaddir and bundleFiles", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]
@@ -14,7 +15,7 @@ Deno.test("recursiveReaddir and bundleFiles", async () => {
   assertEquals(Object.keys(bundle).length, 3)
 })
 
-Deno.test("bundlePath with no matching files", async () => {
+test("bundlePath with no matching files", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".nonexistent"]
@@ -27,7 +28,7 @@ Deno.test("bundlePath with no matching files", async () => {
   )
 })
 
-Deno.test("fileContentFromBundle with existing file", async () => {
+test("fileContentFromBundle with existing file", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]
@@ -53,7 +54,7 @@ Deno.test("fileContentFromBundle with existing file", async () => {
   await Deno.remove(bundleFile)
 })
 
-Deno.test("fileContentFromBundle with non-existing file", async () => {
+test("fileContentFromBundle with non-existing file", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]
@@ -74,7 +75,7 @@ Deno.test("fileContentFromBundle with non-existing file", async () => {
   await Deno.remove(bundleFile)
 })
 
-Deno.test("has() returns true for existing file", async () => {
+test("has() returns true for existing file", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]
@@ -92,7 +93,7 @@ Deno.test("has() returns true for existing file", async () => {
   await Deno.remove(join("./test", "test_bundle.json"))
 })
 
-Deno.test("has() returns false for non-existing file", async () => {
+test("has() returns false for non-existing file", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]
@@ -110,7 +111,7 @@ Deno.test("has() returns false for non-existing file", async () => {
   await Deno.remove(join("./test", "test_bundle.json"))
 })
 
-Deno.test("importLocal loads bundle correctly", async () => {
+test("importLocal loads bundle correctly", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]
@@ -142,7 +143,7 @@ Deno.test("importRemote loads bundle correctly", async () => {
 })
 */
 
-Deno.test("metadata includes createTime and contentType", async () => {
+test("metadata includes createTime and contentType", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]
@@ -170,7 +171,7 @@ Deno.test("metadata includes createTime and contentType", async () => {
   await Deno.remove(bundleFile)
 })
 
-Deno.test("restoreFilesFromBundle", async () => {
+test("restoreFilesFromBundle", async () => {
   const basePath = Deno.cwd()
   const path = join("test", "test_files")
   const exts = [".txt"]

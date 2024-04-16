@@ -22,7 +22,7 @@ for the appropriate URL from the bundle when needed.
 ### Getting files from a bundle
 
 ```typescript
-import { Bundlee } from "https://deno.land/x/bundlee/mod.ts"
+import { Bundlee } from "jsr:@hexagon/bundlee"
 
 // Bundlee.load is a static factory function returning a ready to use instance
 const staticFiles = await Bundlee.load("url")
@@ -41,7 +41,7 @@ To create a bundle using the `bundlee` CLI command, follow these steps:
 1. Install `bundlee` as a command-line tool:
 
 ```sh
-deno install --allow-read --allow-write https://deno.land/x/bundlee/bundlee.ts
+deno install --allow-read --allow-write jsr:@hexagon/bundlee
 ```
 
 2. Use the bundlee command to create a bundle from a specified directory:

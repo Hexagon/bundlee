@@ -235,7 +235,7 @@ export class Bundlee {
   async importAsModule(fileUrl: string) {
     this.loadedBundle = await import(fileUrl, {
       with: { type: "json" },
-    });
+    })
   }
 
   /**
