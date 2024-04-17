@@ -1,10 +1,14 @@
 {
   "name": "@hexagon/bundlee",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "exports": {
     ".": "./bundlee.ts",
     "./mod.ts": "./mod.ts"
   },
+
+  "exclude": [
+    "docs"
+  ],
 
   "fmt": {
     "lineWidth": 200,
@@ -20,7 +24,7 @@
     "@cross/test": "jsr:@cross/test@^0.0.9",
     "@cross/utils": "jsr:@cross/utils@^0.11.0",
     "@std/assert": "jsr:@std/assert@^0.223.0",
-    "@std/encoding": "jsr:@std/encoding@^0.223.0",
+    "@std/encoding/base64url": "jsr:@std/encoding@^0.223.0/base64url",
     "@std/io": "jsr:@std/io@^0.223.0",
     "@std/media-types": "jsr:@std/media-types@^0.223.0",
     "@std/path": "jsr:@std/path@^0.223.0"
